@@ -1,0 +1,27 @@
+{
+  "incidents": [
+    {
+      "id": "SOS-4921",
+      "citizenName": "Priya Raman",
+      "zone": "T Nagar",
+      "lat": 13.0418,
+      "lng": 80.2341,
+      "status": "EN_ROUTE",
+      "createdAt": 1788493080000,
+      "assignedAt": 1788493090000,
+      "enRouteAt": 1788493100000,
+      "arrivedAt": null,
+      "resolvedAt": null,
+      "assignedPatrolId": "P04",
+      "patrol": {
+        "patrolId": "P04",
+        "name": "Patrol 04",
+        "officer": "Insp. R. Selvam"
+      },
+      "etaSeconds": 192,
+      "dispatchDistanceM": 1450,
+      "priority": "HIGH"
+    }
+  ],
+  "serverTime": 1788493200000
+}
