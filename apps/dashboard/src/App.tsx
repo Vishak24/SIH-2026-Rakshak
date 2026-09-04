@@ -9,16 +9,31 @@ import {
   Prediction,
   AiSummary,
 } from './api/client';
+import {
+  Header,
+  KpiCards,
+  IncidentPanel,
+  Timeline,
+  AiPanel,
+  PatrolStrip,
+} from './panels';
 import './App.css';
 
 /**
  * Rakshak Central Command — App Shell
  * Owned by: Dev A (src/App.*)
  *
- * Manages the unified polling loop, top-level state, and responsive command layout.
+ * Unified hero screen showing:
+ * - Header with live IST clock, telemetry status, zone selector, and heatmap toggle
+ * - KpiCards: Active Incidents, Patrols Available, Avg Response Time, City Risk
+ * - Interactive Map Slot (waiting for Dev B CityMap)
+ * - IncidentPanel: Live cards with ticking ETAs, optimistic resolution, and zone sync
+ * - Operational Timeline: Real-time derived events stream with 250ms slide-ins
+ * - AiPanel: Live operational risk model (0-100), contribution bars, model telemetry, and tactical narrative
+ * - PatrolStrip: 10-unit fleet status with dispatched incident links
  */
 export const App: React.FC = () => {
-  // Exact state shape required by contract:
+  // State shape required by contract:
   // { patrols, incidents, predictions, selectedZone, showHeatmap, aiSummary, serverTime, connectionOk }
   const [patrols, setPatrols] = useState<Patrol[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -36,27 +51,6 @@ export const App: React.FC = () => {
   const aiCacheRef = useRef<Map<string, { data: AiSummary; expiresAt: number }>>(
     new Map()
   );
-
-  // Local clock formatted as HH:MM:SS for the command header
-  const [clockTime, setClockTime] = useState<string>('--:--:--');
-
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setClockTime(
-        now.toLocaleTimeString('en-IN', {
-          timeZone: 'Asia/Kolkata',
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })
-      );
-    };
-    updateClock();
-    const clockInterval = setInterval(updateClock, 1000);
-    return () => clearInterval(clockInterval);
-  }, []);
 
   /**
    * Main 3000ms polling loop:
@@ -188,144 +182,131 @@ export const App: React.FC = () => {
     setSelectedZone((prev) => (prev === zone ? null : zone));
   };
 
-  // Quick zone list for testing zone selection interaction in shell
-  const availableZones = ['Adyar', 'T. Nagar', 'Mylapore', 'Velachery', 'Anna Nagar'];
-
   return (
     <div className="rakshak-shell">
-      {/* 1. Header Bar across the top */}
-      <header className="header-bar">
-        <div className="header-brand">
-          <div className="header-badge">LIVE OP</div>
-          <div className="header-titles">
-            <h1 className="header-title">RAKSHAK</h1>
-            <span className="header-subtitle">Central City Safety Command &bull; Chennai</span>
-          </div>
-        </div>
-
-        {/* Zone Selector Pills for testing lifted onSelectZone state */}
-        <div className="header-zone-pills">
-          <span className="zone-pills-label">Zone:</span>
-          <button
-            type="button"
-            className={`zone-pill ${selectedZone === null ? 'zone-pill--active' : ''}`}
-            onClick={() => handleSelectZone(null)}
-          >
-            All
-          </button>
-          {availableZones.map((z) => (
-            <button
-              key={z}
-              type="button"
-              className={`zone-pill ${selectedZone === z ? 'zone-pill--active' : ''}`}
-              onClick={() => handleSelectZone(z)}
-            >
-              {z}
-            </button>
-          ))}
-        </div>
-
-        <div className="header-controls">
-          <div className="header-status-indicator">
-            <span
-              className={`status-dot ${connectionOk ? 'status-dot--online' : 'status-dot--offline'}`}
-            />
-            <span className="status-label">
-              {connectionOk ? 'TELEMETRY ONLINE' : 'CONNECTION WARNING'}
-            </span>
-          </div>
-
-          <div className="header-clock">
-            <span className="clock-timezone">IST</span>
-            <span className="clock-value">{clockTime}</span>
-          </div>
-
-          <button
-            type="button"
-            className={`btn-heatmap-toggle ${showHeatmap ? 'btn-heatmap-toggle--active' : ''}`}
-            onClick={handleToggleHeatmap}
-            title="Toggle risk heatmap layer"
-          >
-            <span className="toggle-indicator" />
-            Heatmap {showHeatmap ? 'ON' : 'OFF'}
-          </button>
-        </div>
-      </header>
+      {/* 1. Command Header Bar */}
+      <Header
+        connectionOk={connectionOk}
+        showHeatmap={showHeatmap}
+        onToggleHeatmap={handleToggleHeatmap}
+        selectedZone={selectedZone}
+        onSelectZone={handleSelectZone}
+      />
 
       {/* 2. Main Two-Column Area */}
       <main className="main-content">
         {/* Left Column: Map Slot (Single one-line swap with Dev B's <CityMap />) */}
         <section className="map-column">
           <div className="map-slot">
-            <div className="map-loading-indicator">
-              <div className="pulse-ring" />
-              <span>Map loading…</span>
-              <small className="map-hint">
-                Dev B CityMap contract mounted here &bull; Active Zone: {selectedZone || 'All Zones'}
-                {focusIncidentId ? ` &bull; Focus ID: ${focusIncidentId}` : ''}
-              </small>
+            {/* Tactical Grid Background & Overlay Lines */}
+            <div className="tactical-grid-bg" />
+
+            {/* Corner Brackets */}
+            <div className="hud-corner hud-corner--tl" />
+            <div className="hud-corner hud-corner--tr" />
+            <div className="hud-corner hud-corner--bl" />
+            <div className="hud-corner hud-corner--br" />
+
+            {/* Top HUD Telemetry Bar */}
+            <div className="map-hud-bar map-hud-bar--top">
+              <div className="hud-badge hud-badge--left">
+                <span className="hud-dot" />
+                <span className="hud-text">
+                  CHENNAI METRO TACTICAL GRID &bull; SECTOR:{' '}
+                  <strong>{selectedZone ? selectedZone.toUpperCase() : 'ALL SECTORS'}</strong>
+                </span>
+              </div>
+              <div className="hud-badge hud-badge--right">
+                <span className="hud-text">
+                  GPS: 13.0827&deg;N, 80.2707&deg;E &bull; REFRESH 3.0s
+                </span>
+              </div>
+            </div>
+
+            {/* Center Tactical Reticle / Dev B Mount Placeholder */}
+            <div className="map-tactical-center">
+              <div className="radar-orbit radar-orbit--outer">
+                <div className="radar-sweep-beam" />
+              </div>
+              <div className="radar-orbit radar-orbit--inner" />
+              <div className="target-reticle" />
+
+              <div className="map-center-readout">
+                <span className="map-status-lead">TACTICAL MAP ENGINE</span>
+                <span className="map-status-sub">
+                  Dev B &lt;CityMap /&gt; Mount Slot Active
+                </span>
+                {focusIncidentId && (
+                  <span className="map-focus-pill">
+                    🎯 TARGET FOCUS: #{focusIncidentId.slice(-6)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom HUD Telemetry Bar */}
+            <div className="map-hud-bar map-hud-bar--bottom">
+              <div className="hud-badge hud-badge--left">
+                <span className="hud-text">
+                  FLEET SENSORS: 10/10 DEPLOYED &bull; AI PREDICTIVE MAPPING ACTIVE
+                </span>
+              </div>
+              <div className="hud-badge hud-badge--right">
+                <span className="hud-scale-mark">[ &mdash;&mdash; 2.5 KM &mdash;&mdash; ]</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Right Column: Stacked Panels */}
+        {/* Right Column: Stacked Command Panels */}
         <aside className="panel-column">
-          {/* Active Incidents Panel Placeholder */}
-          <section className="dashboard-panel panel-incidents">
-            <div className="panel-header">
-              <h2 className="panel-title">Active Incidents</h2>
-              <span className="panel-counter">{incidents.length}</span>
-            </div>
-            <div className="panel-placeholder-body">
-              <span className="placeholder-text">
-                Active Incidents content container (Task A3) &bull; {incidents.length} Live Incidents Polled
-              </span>
-            </div>
-          </section>
+          {/* Live KPI Cards with 300ms count-up/down animations */}
+          <KpiCards
+            incidents={incidents}
+            patrols={patrols}
+            predictions={predictions}
+          />
 
-          {/* Timeline Panel Placeholder */}
-          <section className="dashboard-panel panel-timeline">
-            <div className="panel-header">
-              <h2 className="panel-title">Operational Timeline</h2>
-              <span className="panel-tag">
-                {serverTime ? `Synced ${new Date(serverTime).toLocaleTimeString('en-IN')}` : 'Real-time'}
-              </span>
-            </div>
-            <div className="panel-placeholder-body">
-              <span className="placeholder-text">Timeline content container (Task A4)</span>
-            </div>
-          </section>
+          {/* Active Incidents Panel (Task A3) */}
+          <div className="panel-wrapper panel-wrapper--incidents">
+            <IncidentPanel
+              incidents={incidents}
+              selectedZone={selectedZone}
+              focusIncidentId={focusIncidentId}
+              onFocusIncident={setFocusIncidentId}
+              onSelectZone={handleSelectZone}
+            />
+          </div>
 
-          {/* AI Risk Panel Placeholder */}
-          <section className="dashboard-panel panel-ai-risk">
-            <div className="panel-header">
-              <h2 className="panel-title">AI Predictive Risk</h2>
-              <span className="panel-tag">
-                {selectedZone ? `Zone: ${selectedZone}` : 'Citywide'} ({predictions.length} Models)
-              </span>
-            </div>
-            <div className="panel-placeholder-body">
-              <span className="placeholder-text">
-                {aiSummary ? aiSummary.text : 'AI Risk content container (Task A5)'}
-              </span>
-            </div>
-          </section>
+          {/* Operational Timeline Panel (Task A4) */}
+          <div className="panel-wrapper panel-wrapper--timeline">
+            <Timeline
+              incidents={incidents}
+              onSelectZone={handleSelectZone}
+              onFocusIncident={setFocusIncidentId}
+            />
+          </div>
+
+          {/* AI Predictive Risk Panel (Task A5) */}
+          <div className="panel-wrapper panel-wrapper--ai">
+            <AiPanel
+              predictions={predictions}
+              incidents={incidents}
+              patrols={patrols}
+              selectedZone={selectedZone}
+              aiSummary={aiSummary}
+              onSelectZone={handleSelectZone}
+            />
+          </div>
         </aside>
       </main>
 
-      {/* 3. Patrol Availability Strip along the bottom */}
-      <footer className="patrol-strip-bar">
-        <div className="patrol-strip-header">
-          <h3 className="patrol-strip-title">Patrol Fleet Status</h3>
-          <span className="patrol-count-badge">{patrols.length} Units Deployed</span>
-        </div>
-        <div className="patrol-strip-slot">
-          <span className="placeholder-text">
-            Patrol Availability strip container (Task A6) &bull;{' '}
-            {patrols.filter((p) => p.status === 'PATROLLING').length} of {patrols.length} Available
-          </span>
-        </div>
-      </footer>
+      {/* 3. Patrol Fleet Status Strip (Task A6) */}
+      <PatrolStrip
+        patrols={patrols}
+        focusIncidentId={focusIncidentId}
+        onFocusIncident={setFocusIncidentId}
+      />
     </div>
   );
 };

@@ -13,8 +13,8 @@ export interface HeaderProps {
  * Header Component
  * Owned by: Dev A (src/panels/Header.tsx)
  *
- * Renders the product wordmark, Chennai city label, live 1s IST clock,
- * connection status dot, and heatmap toggle button.
+ * Renders the primary command bar: product wordmark, live IST clock,
+ * telemetry status indicator, zone filter pills, and heatmap toggle.
  */
 export const Header: React.FC<HeaderProps> = ({
   connectionOk,
@@ -45,64 +45,84 @@ export const Header: React.FC<HeaderProps> = ({
     return () => clearInterval(intervalId);
   }, []);
 
-  const sampleZones = ['Adyar', 'T. Nagar', 'Mylapore', 'Velachery', 'Anna Nagar'];
+  const availableZones = ['Adyar', 'T. Nagar', 'Mylapore', 'Velachery', 'Anna Nagar'];
 
   return (
-    <header className="header-bar">
-      <div className="header-brand">
-        <div className="header-badge">LIVE OP</div>
-        <div className="header-titles">
-          <h1 className="header-title">RAKSHAK</h1>
-          <span className="header-subtitle">Central City Safety Command &bull; Chennai</span>
+    <header className="command-header">
+      {/* 1. Left Brand & Operation Identity */}
+      <div className="header-brand-group">
+        <div className="brand-shield-icon">
+          <span className="radar-sweep" />
+          <span className="shield-symbol">🛡️</span>
+        </div>
+        <div className="brand-text-block">
+          <div className="brand-title-row">
+            <h1 className="brand-name">RAKSHAK</h1>
+            <span className="brand-sub-badge">LIVE OPS</span>
+          </div>
+          <span className="brand-subtitle">
+            Central Safety Command &bull; Chennai Metro
+          </span>
         </div>
       </div>
 
+      {/* 2. Center: Sector / Zone Filter Pills */}
       {onSelectZone && (
-        <div className="header-zone-pills">
-          <span className="zone-pills-label">Zone:</span>
-          <button
-            type="button"
-            className={`zone-pill ${selectedZone === null ? 'zone-pill--active' : ''}`}
-            onClick={() => onSelectZone(null)}
-          >
-            All
-          </button>
-          {sampleZones.map((zone) => (
+        <nav className="header-zone-nav" aria-label="Sector Filter">
+          <span className="zone-nav-label">Sector:</span>
+          <div className="zone-pills-bar">
             <button
-              key={zone}
               type="button"
-              className={`zone-pill ${selectedZone === zone ? 'zone-pill--active' : ''}`}
-              onClick={() => onSelectZone(zone)}
+              className={`zone-pill-btn ${selectedZone === null ? 'zone-pill-btn--active' : ''}`}
+              onClick={() => onSelectZone(null)}
             >
-              {zone}
+              All Sectors
             </button>
-          ))}
-        </div>
+            {availableZones.map((zone) => (
+              <button
+                key={zone}
+                type="button"
+                className={`zone-pill-btn ${selectedZone === zone ? 'zone-pill-btn--active' : ''}`}
+                onClick={() => onSelectZone(zone)}
+              >
+                {zone}
+              </button>
+            ))}
+          </div>
+        </nav>
       )}
 
-      <div className="header-controls">
-        <div className="header-status-indicator">
-          <span
-            className={`status-dot ${connectionOk ? 'status-dot--online' : 'status-dot--offline'}`}
-          />
-          <span className="status-label">
-            {connectionOk ? 'TELEMETRY ONLINE' : 'CONNECTION WARNING'}
+      {/* 3. Right: Telemetry, Clock, and Heatmap Toggle */}
+      <div className="header-telemetry-group">
+        {/* Connection Status Badge */}
+        <div
+          className={`telemetry-status-badge ${
+            connectionOk ? 'telemetry--online' : 'telemetry--offline'
+          }`}
+        >
+          <span className="telemetry-beacon" />
+          <span className="telemetry-text">
+            {connectionOk ? 'TELEMETRY ONLINE' : 'DISCONNECTED'}
           </span>
         </div>
 
-        <div className="header-clock">
-          <span className="clock-timezone">IST</span>
-          <span className="clock-value">{istTime}</span>
+        {/* Live IST Monospace Clock */}
+        <div className="header-clock-capsule">
+          <span className="clock-tz">IST</span>
+          <span className="clock-digits">{istTime}</span>
         </div>
 
+        {/* Heatmap Toggle Switch */}
         <button
           type="button"
-          className={`btn-heatmap-toggle ${showHeatmap ? 'btn-heatmap-toggle--active' : ''}`}
+          className={`heatmap-switch-btn ${showHeatmap ? 'heatmap-switch-btn--active' : ''}`}
           onClick={onToggleHeatmap}
-          title="Toggle risk heatmap layer"
+          title="Toggle risk heatmap layer on map"
         >
-          <span className="toggle-indicator" />
-          Heatmap {showHeatmap ? 'ON' : 'OFF'}
+          <span className="heatmap-switch-knob" />
+          <span className="heatmap-switch-label">
+            Heatmap <span className="state-tag">{showHeatmap ? 'ON' : 'OFF'}</span>
+          </span>
         </button>
       </div>
     </header>

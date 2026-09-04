@@ -16,7 +16,8 @@
 .timeline-panel-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-sm) 12px;
+  padding: 6px 10px;
+  min-height: 0;
 }
 
 .timeline-events-list {
@@ -31,8 +32,8 @@
 .timeline-row {
   display: flex;
   align-items: flex-start;
-  padding: 6px 4px;
-  border-radius: var(--radius-sm);
+  padding: 4px 4px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   transition: background-color 0.15s ease;
   position: relative;
@@ -42,7 +43,7 @@
 @keyframes slideInRow {
   0% {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
   100% {
     opacity: 1;
@@ -56,7 +57,7 @@
 
 /* Time Column */
 .timeline-time-col {
-  width: 65px;
+  width: 58px;
   flex-shrink: 0;
   padding-top: 1px;
 }
@@ -66,6 +67,7 @@
   font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
+  letter-spacing: 0.2px;
 }
 
 /* Dot & Connector Column */
@@ -73,18 +75,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 18px;
+  width: 16px;
   flex-shrink: 0;
-  margin-right: 8px;
+  margin-right: 6px;
   position: relative;
   align-self: stretch;
 }
 
 .event-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--radius-full);
-  margin-top: 4px;
+  margin-top: 5px;
   z-index: 2;
   flex-shrink: 0;
 }
@@ -92,7 +94,7 @@
 .timeline-connector-line {
   position: absolute;
   top: 11px;
-  bottom: -6px;
+  bottom: -4px;
   width: 1px;
   background-color: rgba(255, 255, 255, 0.08);
   z-index: 1;
@@ -135,13 +137,14 @@
 .timeline-text-col {
   flex: 1;
   min-width: 0;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .event-text {
   font-size: 11px;
   color: var(--text-primary);
   word-break: break-word;
+  font-weight: 500;
 }
 
 /* Empty State */
@@ -151,24 +154,24 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: var(--space-lg);
+  padding: var(--space-md);
   text-align: center;
 }
 
 .empty-icon {
-  font-size: 24px;
-  margin-bottom: var(--space-xs);
+  font-size: 22px;
+  margin-bottom: 4px;
   opacity: 0.6;
 }
 
 .empty-text {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 .empty-hint {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted);
   margin-top: 2px;
 }

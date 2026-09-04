@@ -1,108 +1,158 @@
 /* ==========================================================================
-   KPI Cards Component Styles
+   KPI Cards Component Styles (2x2 Tactical Grid)
    Owned by: Dev A (src/panels/KpiCards.css)
    ========================================================================== */
 
-.kpi-cards-grid {
+.kpi-panel-wrapper {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-sm);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
   width: 100%;
 }
 
-.stat-card {
+.kpi-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--bg-card);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
-  box-shadow: var(--shadow-card);
-  transition: all 0.2s ease;
+  padding: 7px 11px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  min-height: 64px;
 }
 
-.stat-card:hover {
-  border-color: rgba(56, 189, 248, 0.4);
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.kpi-card--incidents::before {
+  background: linear-gradient(90deg, var(--status-received) 0%, transparent 100%);
+}
+
+.kpi-card--patrols::before {
+  background: linear-gradient(90deg, var(--status-patrolling) 0%, transparent 100%);
+}
+
+.kpi-card--response::before {
+  background: linear-gradient(90deg, var(--status-en-route) 0%, transparent 100%);
+}
+
+.kpi-card--risk::before {
+  background: linear-gradient(90deg, var(--risk-elevated) 0%, transparent 100%);
+}
+
+.kpi-card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.stat-card-top {
+/* Header Row */
+.kpi-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
 }
 
-.stat-card-label {
-  font-size: 11px;
-  font-weight: 600;
+.kpi-card-label {
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
 }
 
-.stat-card-badge {
+.kpi-badge {
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
   letter-spacing: 0.5px;
+  line-height: 1.3;
 }
 
-.stat-card-badge--danger {
+.kpi-badge--danger {
   background-color: rgba(239, 68, 68, 0.15);
   color: var(--status-received);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
-.stat-card-badge--success {
+.kpi-badge--success {
   background-color: rgba(16, 185, 129, 0.15);
   color: var(--status-patrolling);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
-.stat-card-badge--info {
+.kpi-badge--info {
   background-color: rgba(56, 189, 248, 0.15);
   color: var(--text-highlight);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
-.stat-card-badge--neutral {
-  background-color: rgba(100, 116, 139, 0.15);
-  color: var(--text-muted);
-  border: 1px solid rgba(100, 116, 139, 0.3);
+.kpi-badge--neutral {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: var(--text-secondary);
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-.stat-card-value {
+/* Metric Number */
+.kpi-card-metric {
   font-family: var(--font-mono);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.5px;
   color: var(--text-primary);
-  line-height: 1.2;
-  margin: 2px 0;
+  line-height: 1.1;
+  margin: 3px 0 1px 0;
 }
 
-.value-alert {
+.metric--danger {
   color: var(--status-received);
-  text-shadow: 0 0 10px var(--danger-glow);
+  text-shadow: 0 0 12px var(--danger-glow);
 }
 
-.value-nominal {
+.metric--nominal {
   color: var(--status-patrolling);
 }
 
-.value-total {
-  font-size: 14px;
-  color: var(--text-muted);
-  font-weight: 500;
+.metric-time {
+  color: var(--text-highlight);
 }
 
-.stat-card-hint {
+.metric-risk {
+  color: #fb923c;
+}
+
+.metric-denominator {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Footer Hint */
+.kpi-card-footer {
+  display: flex;
+  align-items: center;
+}
+
+.kpi-card-hint {
   font-size: 10px;
   color: var(--text-muted);
   letter-spacing: 0.2px;
