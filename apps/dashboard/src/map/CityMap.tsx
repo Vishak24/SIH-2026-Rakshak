@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { Patrol, Incident, Zone, HeatPoint } from '../lib/types';
 import patrolRoutesData from './assets/patrol_routes.json';
+import chennaiPincodesData from './assets/chennai_pincodes.json';
 import { ZoneLayer } from './layers/ZoneLayer';
 import { PatrolLayer } from './layers/PatrolLayer';
 import { SosLayer } from './layers/SosLayer';
@@ -66,6 +67,21 @@ export const CityMap: React.FC<CityMapProps> = ({
     // Polish: Position zoom controls at topleft so they never overlap right sidebar panels
     L.control.zoom({ position: 'topleft' }).addTo(map);
 
+    // Citywide Chennai Pincode Boundaries from chennai-pincodes.kml
+    const pincodeGroup = L.layerGroup().addTo(map);
+    (chennaiPincodesData as unknown as { features: Array<{ properties: { latLngPolygon?: [number, number][] } }> }).features.forEach((feat) => {
+      if (feat.properties.latLngPolygon && feat.properties.latLngPolygon.length >= 3) {
+        L.polygon(feat.properties.latLngPolygon, {
+          color: '#334155',
+          weight: 1,
+          opacity: 0.35,
+          fillColor: '#0f172a',
+          fillOpacity: 0.04,
+          interactive: false,
+        }).addTo(pincodeGroup);
+      }
+    });
+
     // STRETCH: Faintly draw each patrol's beat route polylines (opacity ~0.15)
     const routeGroup = L.layerGroup().addTo(map);
     routeGroupRef.current = routeGroup;
@@ -123,6 +139,7 @@ export const CityMap: React.FC<CityMapProps> = ({
         resizeObserver.disconnect();
       }
       routeGroup.clearLayers();
+      pincodeGroup.clearLayers();
       heatLayer.destroy();
       zoneLayer.destroy();
       sosLayer.destroy();
