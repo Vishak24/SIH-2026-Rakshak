@@ -1,0 +1,112 @@
+[
+  {
+    "zone": "T Nagar",
+    "hour": 14,
+    "category": "Harassment",
+    "confidence": 0.73,
+    "riskScore": 68,
+    "riskLevel": "ELEVATED",
+    "recommendation": "Intensify pedestrian beat patrols near Usman Road shopping corridor",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Anna Nagar",
+    "hour": 14,
+    "category": "Traffic Violation",
+    "confidence": 0.77,
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "recommendation": "Deploy static interceptor team at 2nd Avenue junction",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Mylapore",
+    "hour": 14,
+    "category": "Theft / Pickpocketing",
+    "confidence": 0.7,
+    "riskScore": 35,
+    "riskLevel": "MODERATE",
+    "recommendation": "Increase plainclothes presence near Kapaleeshwarar temple vicinity",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Adyar",
+    "hour": 14,
+    "category": "Public Nuisance",
+    "confidence": 0.93,
+    "riskScore": 28,
+    "riskLevel": "LOW",
+    "recommendation": "Mobile cruiser sweep along Elliott's Beach promenade",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Guindy",
+    "hour": 14,
+    "category": "Speeding & Accidents",
+    "confidence": 0.89,
+    "riskScore": 54,
+    "riskLevel": "ELEVATED",
+    "recommendation": "Active radar deterrence along GST Road arterial corridor",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Velachery",
+    "hour": 14,
+    "category": "Waterlogging Hazards",
+    "confidence": 0.84,
+    "riskScore": 49,
+    "riskLevel": "MODERATE",
+    "recommendation": "Monitor subway underpasses and route traffic advisory",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Kilpauk",
+    "hour": 14,
+    "category": "Unauthorized Assembly",
+    "confidence": 0.73,
+    "riskScore": 38,
+    "riskLevel": "MODERATE",
+    "recommendation": "Station PCR van near Taylor's Road intersection",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Royapettah",
+    "hour": 14,
+    "category": "Chain Snatching",
+    "confidence": 0.67,
+    "riskScore": 62,
+    "riskLevel": "ELEVATED",
+    "recommendation": "High-visibility motorcycle patrols during market evening peak",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "George Town",
+    "hour": 14,
+    "category": "Commercial Dispute",
+    "confidence": 0.78,
+    "riskScore": 73,
+    "riskLevel": "HIGH",
+    "recommendation": "Market liaison officer stationed at Broadway market perimeter",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  },
+  {
+    "zone": "Nungambakkam",
+    "hour": 14,
+    "category": "Night Patrol Alert",
+    "confidence": 0.8,
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "recommendation": "Sterling Road residential perimeter night surveillance",
+    "modelVersion": "v2.4-xgboost",
+    "source": "Bedrock"
+  }
+]

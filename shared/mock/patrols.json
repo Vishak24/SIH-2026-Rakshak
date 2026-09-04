@@ -1,0 +1,125 @@
+{
+  "patrols": [
+    {
+      "patrolId": "P01",
+      "name": "Patrol 01",
+      "officer": "Insp. R. Selvam",
+      "zone": "T Nagar",
+      "lat": 13.0418,
+      "lng": 80.239279,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P02",
+      "name": "Patrol 02",
+      "officer": "SI K. Murugan",
+      "zone": "Anna Nagar",
+      "lat": 13.086965,
+      "lng": 80.214871,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P03",
+      "name": "Patrol 03",
+      "officer": "Insp. V. Anitha",
+      "zone": "Mylapore",
+      "lat": 13.037519,
+      "lng": 80.271308,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P04",
+      "name": "Patrol 04",
+      "officer": "SI S. Kumar",
+      "zone": "Adyar",
+      "lat": 13.005902,
+      "lng": 80.258376,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P05",
+      "name": "Patrol 05",
+      "officer": "Insp. D. Vignesh",
+      "zone": "Guindy",
+      "lat": 13.011743,
+      "lng": 80.202349,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P06",
+      "name": "Patrol 06",
+      "officer": "SI M. Deepa",
+      "zone": "Velachery",
+      "lat": 12.986087,
+      "lng": 80.215845,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P07",
+      "name": "Patrol 07",
+      "officer": "Insp. G. Prakash",
+      "zone": "Kilpauk",
+      "lat": 13.086108,
+      "lng": 80.239881,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P08",
+      "name": "Patrol 08",
+      "officer": "SI P. Karthik",
+      "zone": "Royapettah",
+      "lat": 13.06039,
+      "lng": 80.25932,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P09",
+      "name": "Patrol 09",
+      "officer": "Insp. T. Natarajan",
+      "zone": "George Town",
+      "lat": 13.089705,
+      "lng": 80.274829,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    },
+    {
+      "patrolId": "P10",
+      "name": "Patrol 10",
+      "officer": "SI B. Lakshmi",
+      "zone": "Nungambakkam",
+      "lat": 13.057767,
+      "lng": 80.235356,
+      "heading": 45.0,
+      "status": "PATROLLING",
+      "assignedIncidentId": null,
+      "etaSeconds": null
+    }
+  ],
+  "serverTime": 1788493200000
+}
