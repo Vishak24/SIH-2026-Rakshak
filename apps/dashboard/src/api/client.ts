@@ -1,135 +1,245 @@
-import { Patrol, Incident, Prediction, AiSummary } from '../lib/types';
+/**
+ * Rakshak Central Command — API Client
+ * Owned by: Dev A (src/api/client.*)
+ *
+ * Handles live backend calls and mock simulator dispatch for patrol,
+ * incident, prediction, and AI narrative endpoints.
+ */
+
+// Deliberate shared dependency: Dev B builds src/map/sim/simulator
+// TODO (Task A1): Confirm exact import path with Dev B when simulator is ready.
 import { simulator } from '../map/sim/simulator';
-import { generateFallbackAiSummary } from '../lib/derive';
-import mockPredictions from '@shared/mock/predictions.json';
+import mockPredictions from '../../../../shared/mock/predictions.json';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
+export type PatrolStatus = 'PATROLLING' | 'ASSIGNED' | 'EN_ROUTE' | 'ON_SCENE';
+export type IncidentStatus = 'RECEIVED' | 'ASSIGNED' | 'EN_ROUTE' | 'ARRIVED' | 'RESOLVED';
+export type IncidentPriority = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
-// 60-second AI summary cache per zone
-interface CachedSummary {
-  summary: AiSummary;
-  timestamp: number;
+export interface Patrol {
+  patrolId: string;
+  name: string;
+  officer: string;
+  zone: string;
+  lat: number;
+  lng: number;
+  heading: number;
+  status: PatrolStatus;
+  assignedIncidentId: string | null;
+  etaSeconds: number | null;
 }
-const aiSummaryCache = new Map<string, CachedSummary>();
 
-export async function getPatrols(): Promise<{ patrols: Patrol[]; serverTime: number }> {
-  if (USE_MOCK) {
-    return simulator.getPatrols();
-  }
+export interface Incident {
+  id: string;
+  citizenName: string;
+  zone: string;
+  lat: number;
+  lng: number;
+  status: IncidentStatus;
+  createdAt: number;
+  assignedAt: number | null;
+  enRouteAt: number | null;
+  arrivedAt: number | null;
+  resolvedAt: number | null;
+  assignedPatrolId: string | null;
+  patrol?: {
+    patrolId: string;
+    name: string;
+    officer: string;
+  } | null;
+  etaSeconds: number | null;
+  dispatchDistanceM: number | null;
+  priority: IncidentPriority;
+}
 
-  try {
-    const res = await fetch(`${API_BASE}/patrols`, { signal: AbortSignal.timeout(2500) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+export interface Prediction {
+  zone: string;
+  hour: number;
+  category: string;
+  confidence: number;
+  riskScore: number;
+  riskLevel: 'LOW' | 'MODERATE' | 'ELEVATED' | 'HIGH';
+  recommendation: string;
+  modelVersion: string;
+  source: string;
+}
+
+export interface AiSummary {
+  zone: string;
+  text: string;
+  source: string;
+}
+
+export interface PatrolsResponse {
+  patrols: Patrol[];
+  serverTime?: number;
+}
+
+export interface IncidentsResponse {
+  incidents: Incident[];
+  serverTime?: number;
+}
+
+/**
+ * Reads environment variables dynamically at runtime
+ */
+function getEnvConfig() {
+  const rawBase = import.meta.env.VITE_API_BASE;
+  const apiBase = rawBase ? rawBase.replace(/\/+$/, '') : 'http://localhost:3000';
+  const useMock =
+    import.meta.env.VITE_USE_MOCK === 'true' ||
+    import.meta.env.VITE_USE_MOCK === true ||
+    import.meta.env.VITE_USE_MOCK === undefined; // default to mock if unset for demo reliability
+  return { apiBase, useMock };
+}
+
+/**
+ * 1. getPatrols()
+ * Contract: GET /patrols -> { patrols: [...], serverTime }
+ */
+export async function getPatrols(): Promise<PatrolsResponse> {
+  const { apiBase, useMock } = getEnvConfig();
+
+  if (useMock) {
+    const rawPatrols = simulator.getPatrols();
     return {
-      patrols: data.patrols || [],
-      serverTime: data.serverTime || Date.now(),
+      patrols: rawPatrols,
+      serverTime: Date.now(),
     };
-  } catch (err) {
-    console.warn('[API] /patrols fetch failed, using simulator fallback:', err);
-    return simulator.getPatrols();
   }
+
+  const res = await fetch(`${apiBase}/patrols`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch patrols: ${res.status} ${res.statusText}`);
+  }
+  const data: PatrolsResponse = await res.json();
+  return data;
 }
 
-export async function getIncidents(): Promise<{ incidents: Incident[]; serverTime: number }> {
-  if (USE_MOCK) {
-    return simulator.getIncidents();
-  }
+/**
+ * 2. getIncidents()
+ * Contract: GET /sos/live -> { incidents: [...], serverTime }
+ */
+export async function getIncidents(): Promise<IncidentsResponse> {
+  const { apiBase, useMock } = getEnvConfig();
 
-  try {
-    const res = await fetch(`${API_BASE}/sos/live`, { signal: AbortSignal.timeout(2500) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+  if (useMock) {
+    const rawIncidents = simulator.getIncidents();
     return {
-      incidents: data.incidents || [],
-      serverTime: data.serverTime || Date.now(),
+      incidents: rawIncidents,
+      serverTime: Date.now(),
     };
-  } catch (err) {
-    console.warn('[API] /sos/live fetch failed, using simulator fallback:', err);
-    return simulator.getIncidents();
   }
+
+  const res = await fetch(`${apiBase}/sos/live`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch live incidents: ${res.status} ${res.statusText}`);
+  }
+  const data: IncidentsResponse = await res.json();
+  return data;
 }
 
-export async function resolveIncident(id: string): Promise<Incident | null> {
-  // Always update simulator so mock/offline stays synchronized
-  const simUpdated = simulator.resolveIncident(id);
+/**
+ * 3. resolveIncident(id)
+ * Contract: PATCH /sos/resolve/{id} -> returns updated incident
+ */
+export async function resolveIncident(id: string): Promise<Incident> {
+  const { apiBase, useMock } = getEnvConfig();
 
-  if (USE_MOCK) {
-    return simUpdated;
+  if (useMock) {
+    const currentIncidents = simulator.getIncidents();
+    const target = currentIncidents.find((inc) => inc.id === id);
+    if (!target) {
+      throw new Error(`Mock incident ${id} not found`);
+    }
+    target.status = 'RESOLVED';
+    target.resolvedAt = Date.now();
+    return { ...target };
+  }
+
+  const res = await fetch(`${apiBase}/sos/resolve/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to resolve incident ${id}: ${res.status} ${res.statusText}`);
+  }
+  const data: Incident = await res.json();
+  return data;
+}
+
+/**
+ * 4. getPredictions(zone?)
+ * Contract: GET /predict -> array of predictions. ?zone= returns a single object.
+ */
+export async function getPredictions(zone?: string): Promise<Prediction[] | Prediction> {
+  const { apiBase, useMock } = getEnvConfig();
+
+  if (useMock) {
+    const predictionsList = (mockPredictions as Prediction[]) || [];
+    if (zone) {
+      const match = predictionsList.find(
+        (p) => p.zone.toLowerCase() === zone.toLowerCase()
+      );
+      if (match) return match;
+      // Fallback prediction object if specific zone not found in mock list
+      return {
+        zone,
+        hour: new Date().getHours(),
+        category: 'Area Patrol & Surveillance',
+        confidence: 0.85,
+        riskScore: 0.5,
+        riskLevel: 'MODERATE',
+        recommendation: 'Maintain standard patrol presence and check transit intersections.',
+        modelVersion: 'rakshak-v1.4-chennai',
+        source: 'Mock Predictive Model',
+      };
+    }
+    return predictionsList;
+  }
+
+  const url = zone
+    ? `${apiBase}/predict?zone=${encodeURIComponent(zone)}`
+    : `${apiBase}/predict`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch predictions: ${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
+/**
+ * 5. getAiSummary(zone?)
+ * Contract: GET /ai/summary?zone= -> { zone, text, source }
+ * Client-side fallback provided so AI panel is never empty even if backend endpoint is unavailable.
+ */
+export async function getAiSummary(zone?: string | null): Promise<AiSummary> {
+  const { apiBase, useMock } = getEnvConfig();
+  const targetZone = zone || 'Chennai Central';
+
+  if (useMock) {
+    // Hand-built fallback summary object for mock mode
+    return {
+      zone: targetZone,
+      text: `Tactical telemetry indicates moderate activity in ${targetZone}. Patrol coverage is actively distributed with 2 rapid response units within 4-minute reach. High-risk arterial intersections are prioritized for preemptive deterrence.`,
+      source: 'Rakshak AI Copilot (Simulated)',
+    };
   }
 
   try {
-    const res = await fetch(`${API_BASE}/sos/resolve/${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(3000),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.warn('[API] /sos/resolve failed on network, simulator resolved locally:', err);
-    return simUpdated;
-  }
-}
-
-export async function getPredictions(): Promise<Prediction[]> {
-  if (USE_MOCK) {
-    return mockPredictions as Prediction[];
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/predict`, { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return Array.isArray(data) ? (data as Prediction[]) : (mockPredictions as Prediction[]);
-  } catch (err) {
-    console.warn('[API] /predict failed, using mock predictions fallback:', err);
-    return mockPredictions as Prediction[];
-  }
-}
-
-export async function getAiSummary(zoneName: string, predictions?: Prediction[]): Promise<AiSummary> {
-  const cached = aiSummaryCache.get(zoneName);
-  const now = Date.now();
-  if (cached && now - cached.timestamp < 60000) {
-    return cached.summary;
-  }
-
-  if (USE_MOCK) {
-    const pred = (predictions || (mockPredictions as Prediction[])).find(
-      (p) => p.zone.toLowerCase() === zoneName.toLowerCase()
-    );
-    const summary: AiSummary = {
-      zone: zoneName,
-      text: generateFallbackAiSummary(zoneName, pred),
-      source: 'Rule-based',
-    };
-    aiSummaryCache.set(zoneName, { summary, timestamp: now });
-    return summary;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/ai/summary?zone=${encodeURIComponent(zoneName)}`, {
-      signal: AbortSignal.timeout(3000),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const summary: AiSummary = {
-      zone: data.zone || zoneName,
-      text: data.text || generateFallbackAiSummary(zoneName),
-      source: data.source || 'Bedrock',
-    };
-    aiSummaryCache.set(zoneName, { summary, timestamp: now });
-    return summary;
+    const res = await fetch(`${apiBase}/ai/summary?zone=${encodeURIComponent(targetZone)}`);
+    if (!res.ok) {
+      throw new Error(`AI summary HTTP ${res.status}`);
+    }
+    const data: AiSummary = await res.json();
+    return data;
   } catch {
-    const pred = predictions?.find((p) => p.zone.toLowerCase() === zoneName.toLowerCase());
-    const fallback: AiSummary = {
-      zone: zoneName,
-      text: generateFallbackAiSummary(zoneName, pred),
-      source: 'Rule-based',
+    // Graceful fallback if backend endpoint does not exist or fails
+    return {
+      zone: targetZone,
+      text: `Patrol telemetry active for ${targetZone}. Units maintain automated grid presence. Preemptive route optimization is actively monitoring incoming dispatch calls.`,
+      source: 'Rule-based fallback',
     };
-    aiSummaryCache.set(zoneName, { summary: fallback, timestamp: now });
-    return fallback;
   }
 }

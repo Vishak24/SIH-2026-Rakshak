@@ -1,0 +1,177 @@
+/* ==========================================================================
+   Timeline Panel Component Styles
+   Owned by: Dev A (src/panels/Timeline.css)
+   ========================================================================== */
+
+.timeline-panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.timeline-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 10px;
+  min-height: 0;
+}
+
+.timeline-events-list {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Timeline Row & Slide-in Animation (250ms)
+   -------------------------------------------------------------------------- */
+.timeline-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  position: relative;
+  animation: slideInRow 250ms ease-out;
+}
+
+@keyframes slideInRow {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timeline-row:hover {
+  background-color: var(--bg-card-hover);
+}
+
+/* Time Column */
+.timeline-time-col {
+  width: 58px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.event-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+/* Dot & Connector Column */
+.timeline-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 16px;
+  flex-shrink: 0;
+  margin-right: 6px;
+  position: relative;
+  align-self: stretch;
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  margin-top: 5px;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.timeline-connector-line {
+  position: absolute;
+  top: 11px;
+  bottom: -4px;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  z-index: 1;
+}
+
+.timeline-row:last-child .timeline-connector-line {
+  display: none;
+}
+
+/* Event Dot Colors mapped to semantic variables */
+.dot--received {
+  background-color: var(--status-received);
+  box-shadow: 0 0 6px var(--danger-glow);
+}
+
+.dot--assigned {
+  background-color: var(--status-assigned);
+  box-shadow: 0 0 6px rgba(14, 165, 233, 0.4);
+}
+
+.dot--en-route {
+  background-color: var(--status-en-route);
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+}
+
+.dot--arrived {
+  background-color: var(--status-on-scene);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.dot--resolved {
+  background-color: var(--status-resolved);
+}
+
+.dot--neutral {
+  background-color: var(--text-muted);
+}
+
+/* Text Column */
+.timeline-text-col {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.event-text {
+  font-size: 11px;
+  color: var(--text-primary);
+  word-break: break-word;
+  font-weight: 500;
+}
+
+/* Empty State */
+.timeline-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 22px;
+  margin-bottom: 4px;
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.empty-hint {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

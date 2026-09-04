@@ -1,61 +1,94 @@
-import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle2, Navigation, User, MapPin } from 'lucide-react';
-import { Incident } from '../lib/types';
-import { formatEta } from '../lib/derive';
+import React, { useState } from 'react';
+import { Incident, IncidentStatus, resolveIncident } from '../api/client';
+import { IncidentCard } from './IncidentCard';
+import './IncidentPanel.css';
 
-interface IncidentPanelProps {
+export interface IncidentPanelProps {
   incidents: Incident[];
-  onResolve: (id: string) => Promise<void>;
-  onFocusIncident: (id: string, zone: string) => void;
-  selectedIncidentId?: string | null;
+  selectedZone?: string | null;
+  focusIncidentId?: string | null;
+  onFocusIncident?: (id: string) => void;
+  onSelectZone?: (zone: string | null) => void;
 }
 
+interface OptimisticState {
+  status: IncidentStatus;
+  resolvedAt: number;
+}
+
+const TEN_MINUTES_MS = 10 * 60 * 1000;
+
+/**
+ * IncidentPanel Component
+ * Owned by: Dev A (src/panels/IncidentPanel.tsx)
+ *
+ * Renders active incident cards sorted newest-first by createdAt,
+ * manages optimistic resolution with rollback, ETA countdowns,
+ * 10-minute resolved filtering, and calm empty state.
+ */
 export const IncidentPanel: React.FC<IncidentPanelProps> = ({
   incidents,
-  onResolve,
+  selectedZone,
+  focusIncidentId,
   onFocusIncident,
-  selectedIncidentId,
+  onSelectZone,
 }) => {
-  const [resolvingIds, setResolvingIds] = useState<Set<string>>(new Set());
-  const [localEtas, setLocalEtas] = useState<Record<string, number>>({});
-  const [, setClockTick] = useState(0);
+  // Optimistic overrides for resolution: keyed by incident ID
+  const [optimisticOverrides, setOptimisticOverrides] = useState<Map<string, OptimisticState>>(
+    new Map()
+  );
 
-  // Sync incoming polled ETAs
-  useEffect(() => {
-    setLocalEtas((prev) => {
-      const next = { ...prev };
-      for (const inc of incidents) {
-        if (inc.etaSeconds !== null && inc.etaSeconds !== undefined) {
-          next[inc.id] = inc.etaSeconds;
-        }
-      }
+  // In-flight resolve tracking: Set of incident IDs
+  const [inFlightResolves, setInFlightResolves] = useState<Set<string>>(new Set());
+
+  // Error banners for failed resolve attempts: keyed by incident ID
+  const [resolveErrors, setResolveErrors] = useState<Map<string, string>>(new Map());
+
+  // Current timestamp for client-side 10-minute resolved filtering
+  const now = Date.now();
+
+  // Optimistic resolve handler
+  const handleResolve = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (inFlightResolves.has(id)) return;
+
+    // 1. Optimistically mark as RESOLVED in local state
+    const resolvedTimestamp = Date.now();
+    setOptimisticOverrides((prev) => {
+      const next = new Map(prev);
+      next.set(id, { status: 'RESOLVED', resolvedAt: resolvedTimestamp });
       return next;
     });
-  }, [incidents]);
 
-  // Local 1-second ETA countdown
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setLocalEtas((prev) => {
-        const next: Record<string, number> = {};
-        for (const [id, seconds] of Object.entries(prev)) {
-          next[id] = Math.max(0, seconds - 1);
-        }
+    setInFlightResolves((prev) => new Set(prev).add(id));
+    setResolveErrors((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+
+    try {
+      // 2. Dispatch real or mock resolve call
+      await resolveIncident(id);
+    } catch (err: unknown) {
+      // 3. Roll back optimistic update on failure and display inline error
+      const message =
+        err instanceof Error ? err.message : 'Network error resolving incident';
+
+      setOptimisticOverrides((prev) => {
+        const next = new Map(prev);
+        next.delete(id);
         return next;
       });
-      setClockTick((t) => t + 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
-  const handleResolve = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (resolvingIds.has(id)) return;
-    setResolvingIds((prev) => new Set(prev).add(id));
-    try {
-      await onResolve(id);
+      setResolveErrors((prev) => {
+        const next = new Map(prev);
+        next.set(id, message);
+        return next;
+      });
     } finally {
-      setResolvingIds((prev) => {
+      setInFlightResolves((prev) => {
         const next = new Set(prev);
         next.delete(id);
         return next;
@@ -63,132 +96,96 @@ export const IncidentPanel: React.FC<IncidentPanelProps> = ({
     }
   };
 
-  const formatElapsedAgo = (createdAtMs: number) => {
-    const elapsedSec = Math.max(0, Math.floor((Date.now() - createdAtMs) / 1000));
-    if (elapsedSec < 60) return `${elapsedSec}s ago`;
-    const mins = Math.floor(elapsedSec / 60);
-    return `${mins}m ago`;
-  };
-
-  const getStatusChipClass = (status: Incident['status']) => {
-    switch (status) {
-      case 'RECEIVED':
-        return 'chip-received';
-      case 'ASSIGNED':
-        return 'chip-assigned';
-      case 'EN_ROUTE':
-        return 'chip-enroute';
-      case 'ARRIVED':
-        return 'chip-arrived';
-      case 'RESOLVED':
-        return 'chip-resolved';
-      default:
-        return 'chip-received';
+  // Card click: focus incident on map and select its zone for AI panel
+  const handleCardClick = (incident: Incident) => {
+    if (onFocusIncident) {
+      onFocusIncident(incident.id);
+    }
+    if (onSelectZone) {
+      onSelectZone(incident.zone);
     }
   };
 
-  // Sort: active incidents newest first, resolved at bottom
-  const sortedIncidents = [...incidents].sort((a, b) => {
-    if (a.status === 'RESOLVED' && b.status !== 'RESOLVED') return 1;
-    if (a.status !== 'RESOLVED' && b.status === 'RESOLVED') return -1;
-    return b.createdAt - a.createdAt;
+  // 1. Filter out resolved incidents that are older than 10 minutes
+  const visibleIncidents = incidents.filter((incident) => {
+    const override = optimisticOverrides.get(incident.id);
+    const effectiveStatus = override ? override.status : incident.status;
+    const effectiveResolvedAt = override ? override.resolvedAt : incident.resolvedAt;
+
+    if (effectiveStatus === 'RESOLVED' && effectiveResolvedAt) {
+      const timeSinceResolved = now - effectiveResolvedAt;
+      if (timeSinceResolved > TEN_MINUTES_MS) {
+        return false; // Hide completely after 10 minutes
+      }
+    }
+    return true;
   });
 
+  // 2. Sort newest-first by createdAt
+  const sortedIncidents = [...visibleIncidents].sort(
+    (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
+  );
+
+  const activeCount = sortedIncidents.filter((inc) => {
+    const override = optimisticOverrides.get(inc.id);
+    const status = override ? override.status : inc.status;
+    return status !== 'RESOLVED';
+  }).length;
+
   return (
-    <section className="incident-panel">
+    <section className="dashboard-panel incident-panel-container">
       <div className="panel-header">
-        <div className="panel-title-group">
-          <AlertCircle size={15} className="text-accent-red" />
-          <h2 className="panel-title">ACTIVE INCIDENTS</h2>
+        <div className="panel-header-left">
+          <h2 className="panel-title">Active Incidents</h2>
+          <span className="panel-counter">{activeCount}</span>
         </div>
-        <span className="incident-count-pill font-mono">
-          {incidents.filter((i) => i.status !== 'RESOLVED').length}
-        </span>
+        {selectedZone && (
+          <span className="panel-zone-badge">{selectedZone}</span>
+        )}
       </div>
 
-      <div className="incident-list">
+      <div className="incident-panel-body">
         {sortedIncidents.length === 0 ? (
-          <div className="incident-empty-state">
-            <CheckCircle2 size={32} className="text-accent-green opacity-70" />
-            <p className="empty-title">No active incidents</p>
-            <p className="empty-subtitle">City operational status nominal</p>
+          <div className="calm-empty-state">
+            <div className="empty-state-icon">🛡️</div>
+            <p className="empty-state-title">No active incidents — city nominal</p>
+            <span className="empty-state-desc">
+              Automated dispatch and patrols are monitoring all city sectors.
+            </span>
           </div>
         ) : (
-          sortedIncidents.map((inc) => {
-            const isResolved = inc.status === 'RESOLVED';
-            const isSelected = selectedIncidentId === inc.id;
-            const isResolving = resolvingIds.has(inc.id);
-            const eta = localEtas[inc.id] ?? inc.etaSeconds ?? 0;
-            const patrolName = inc.patrol?.name || (inc.assignedPatrolId ? `Patrol ${inc.assignedPatrolId}` : null);
+          <div className="incident-cards-list">
+            {sortedIncidents.map((incident) => {
+              const override = optimisticOverrides.get(incident.id);
+              const effectiveStatus = override ? override.status : incident.status;
+              const effectiveResolvedAt = override
+                ? override.resolvedAt
+                : incident.resolvedAt;
+              const isResolving = inFlightResolves.has(incident.id);
+              const errorMessage = resolveErrors.get(incident.id);
+              const isSelectedZone = selectedZone === incident.zone;
+              const isFocused = focusIncidentId === incident.id;
 
-            return (
-              <div
-                key={inc.id}
-                className={`incident-card ${isResolved ? 'incident-card-resolved' : ''} ${
-                  isSelected ? 'incident-card-selected' : ''
-                }`}
-                onClick={() => onFocusIncident(inc.id, inc.zone)}
-              >
-                <div className="incident-card-header">
-                  <div className="flex items-center gap-2">
-                    <span className="incident-id font-mono">{inc.id}</span>
-                    <span className={`status-chip font-mono ${getStatusChipClass(inc.status)}`}>
-                      {inc.status}
-                    </span>
-                  </div>
-                  <span className="incident-elapsed font-mono">{formatElapsedAgo(inc.createdAt)}</span>
-                </div>
-
-                <div className="incident-card-body">
-                  <div className="incident-info-row">
-                    <div className="info-cell">
-                      <MapPin size={13} className="cell-icon" />
-                      <span className="cell-text">{inc.zone}</span>
-                    </div>
-                    <div className="info-cell">
-                      <User size={13} className="cell-icon" />
-                      <span className="cell-text">{inc.citizenName}</span>
-                    </div>
-                  </div>
-
-                  <div className="incident-dispatch-row">
-                    {patrolName ? (
-                      <div className="patrol-badge">
-                        <Navigation size={12} className="patrol-nav-icon" />
-                        <span className="patrol-name font-mono">{patrolName}</span>
-                      </div>
-                    ) : (
-                      <span className="dispatch-pending text-muted">Awaiting assignment...</span>
-                    )}
-
-                    {!isResolved && inc.status !== 'ARRIVED' && (
-                      <div className="eta-badge font-mono">
-                        <span className="eta-prefix">ETA</span>
-                        <span className="eta-val">{formatEta(eta)}</span>
-                      </div>
-                    )}
-                    {inc.status === 'ARRIVED' && (
-                      <span className="onscene-badge font-mono">ON SCENE</span>
-                    )}
-                  </div>
-                </div>
-
-                {!isResolved && (
-                  <div className="incident-card-actions">
-                    <button
-                      className="resolve-btn"
-                      disabled={isResolving}
-                      onClick={(e) => handleResolve(e, inc.id)}
-                    >
-                      {isResolving ? 'Resolving...' : 'Resolve Incident'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })
+              return (
+                <IncidentCard
+                  key={incident.id}
+                  incident={incident}
+                  effectiveStatus={effectiveStatus}
+                  effectiveResolvedAt={effectiveResolvedAt}
+                  isResolving={isResolving}
+                  errorMessage={errorMessage}
+                  isSelectedZone={isSelectedZone}
+                  isFocused={isFocused}
+                  onResolve={handleResolve}
+                  onCardClick={handleCardClick}
+                />
+              );
+            })}
+          </div>
         )}
       </div>
     </section>
   );
 };
+
+export default IncidentPanel;

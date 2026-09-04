@@ -1,77 +1,102 @@
 import React from 'react';
-import { Car } from 'lucide-react';
-import { Patrol } from '../lib/types';
+import { Patrol, PatrolStatus } from '../api/client';
+import './PatrolStrip.css';
 
-interface PatrolStripProps {
+export interface PatrolStripProps {
   patrols: Patrol[];
-  onFocusPatrol: (incidentId: string, zone: string) => void;
+  focusIncidentId?: string | null;
+  onFocusIncident?: (incidentId: string) => void;
 }
 
-export const PatrolStrip: React.FC<PatrolStripProps> = ({ patrols, onFocusPatrol }) => {
-  const getStatusDotClass = (status: Patrol['status']) => {
-    switch (status) {
-      case 'EN_ROUTE':
-        return 'dot-enroute';
-      case 'ON_SCENE':
-        return 'dot-onscene';
-      case 'PATROLLING':
-      default:
-        return 'dot-patrolling';
+/**
+ * Maps patrol status to theme semantic status dot class
+ */
+function getPatrolStatusDotClass(status: PatrolStatus): string {
+  switch (status) {
+    case 'PATROLLING':
+      return 'patrol-dot--patrolling';
+    case 'EN_ROUTE':
+      return 'patrol-dot--en-route';
+    case 'ON_SCENE':
+      return 'patrol-dot--on-scene';
+    case 'ASSIGNED':
+      return 'patrol-dot--assigned';
+    default:
+      return 'patrol-dot--patrolling';
+  }
+}
+
+/**
+ * PatrolStrip Component
+ * Owned by: Dev A (src/panels/PatrolStrip.tsx)
+ *
+ * Renders a single horizontal row of exactly ten chips spanning the bottom of the dashboard.
+ * Never wraps, scaling/truncating text to remain visible across 1440px–1920px.
+ * Clicking a chip with an assigned incident triggers focus on that incident.
+ */
+export const PatrolStrip: React.FC<PatrolStripProps> = ({
+  patrols,
+  focusIncidentId,
+  onFocusIncident,
+}) => {
+  // Guarantee exactly up to ten chips
+  const displayPatrols = patrols.slice(0, 10);
+
+  const handleChipClick = (patrol: Patrol) => {
+    if (patrol.assignedIncidentId && onFocusIncident) {
+      onFocusIncident(patrol.assignedIncidentId);
     }
   };
-
-  const getStatusLabel = (status: Patrol['status']) => {
-    switch (status) {
-      case 'EN_ROUTE':
-        return 'EN ROUTE';
-      case 'ON_SCENE':
-        return 'ON SCENE';
-      case 'PATROLLING':
-      default:
-        return 'PATROL';
-    }
-  };
-
-  // Sort patrols P01..P10
-  const sortedPatrols = [...patrols].sort((a, b) => a.patrolId.localeCompare(b.patrolId));
 
   return (
-    <footer className="patrol-strip-container">
-      <div className="patrol-strip-title">
-        <Car size={14} className="text-accent-blue" />
-        <span>PATROL FLEET</span>
+    <footer className="patrol-strip-bar">
+      <div className="patrol-strip-header">
+        <span className="patrol-strip-title">Fleet Status</span>
+        <span className="patrol-count-badge">
+          {patrols.filter((p) => p.status === 'PATROLLING').length} / {displayPatrols.length} Avail
+        </span>
       </div>
 
-      <div className="patrol-chips-scroll">
-        {sortedPatrols.map((p) => {
-          const isAssigned = p.status === 'EN_ROUTE' || p.status === 'ON_SCENE';
+      <div className="patrol-chips-container">
+        {displayPatrols.map((patrol) => {
+          const hasAssignedIncident = Boolean(patrol.assignedIncidentId);
+          const isFocused =
+            hasAssignedIncident && focusIncidentId === patrol.assignedIncidentId;
+
+          const shortIncId = patrol.assignedIncidentId
+            ? patrol.assignedIncidentId.length > 6
+              ? patrol.assignedIncidentId.slice(-6)
+              : patrol.assignedIncidentId
+            : null;
 
           return (
             <div
-              key={p.patrolId}
-              className={`patrol-chip ${isAssigned ? 'patrol-chip-assigned' : ''}`}
-              onClick={() => {
-                if (p.assignedIncidentId) {
-                  onFocusPatrol(p.assignedIncidentId, p.zone);
-                }
-              }}
-              title={`${p.name} (${p.officer}) · ${p.zone} · Status: ${p.status}${
-                p.assignedIncidentId ? ` · Assigned to ${p.assignedIncidentId}` : ''
-              }`}
+              key={patrol.patrolId}
+              className={`patrol-chip ${
+                hasAssignedIncident ? 'patrol-chip--clickable' : 'patrol-chip--idle'
+              } ${isFocused ? 'patrol-chip--focused' : ''}`}
+              onClick={() => handleChipClick(patrol)}
+              role={hasAssignedIncident ? 'button' : undefined}
+              tabIndex={hasAssignedIncident ? 0 : undefined}
+              title={
+                hasAssignedIncident
+                  ? `Click to focus incident #${shortIncId} (${patrol.name})`
+                  : `${patrol.name} (${patrol.officer}) - ${patrol.status}`
+              }
             >
-              <span className={`patrol-chip-dot ${getStatusDotClass(p.status)}`}></span>
-              <span className="patrol-chip-id font-mono">{p.patrolId}</span>
-              <span className="patrol-chip-zone">{p.zone}</span>
+              {/* Status Dot */}
+              <span className={`patrol-dot ${getPatrolStatusDotClass(patrol.status)}`} />
 
-              {p.assignedIncidentId && (
-                <span className="patrol-chip-incident font-mono">
-                  ▲ {p.assignedIncidentId}
-                </span>
-              )}
+              {/* Patrol Identity */}
+              <span className="patrol-name-text">{patrol.name}</span>
 
-              {!p.assignedIncidentId && (
-                <span className="patrol-chip-status font-mono">
-                  {getStatusLabel(p.status)}
+              {/* Current Zone */}
+              <span className="patrol-zone-text">{patrol.zone}</span>
+
+              {/* Assigned Incident Tag if Dispatched */}
+              {shortIncId && (
+                <span className="patrol-assigned-badge" title={`Assigned: ${patrol.assignedIncidentId}`}>
+                  #{shortIncId}
                 </span>
               )}
             </div>
@@ -81,3 +106,5 @@ export const PatrolStrip: React.FC<PatrolStripProps> = ({ patrols, onFocusPatrol
     </footer>
   );
 };
+
+export default PatrolStrip;
