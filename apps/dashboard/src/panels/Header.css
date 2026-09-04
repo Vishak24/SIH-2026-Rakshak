@@ -1,0 +1,200 @@
+/* ==========================================================================
+   Header Component Styles
+   Owned by: Dev A (src/panels/Header.css)
+   ========================================================================== */
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 var(--space-lg);
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.header-badge {
+  padding: 3px 8px;
+  background: rgba(2, 132, 199, 0.2);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-highlight);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+.header-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.header-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.header-zone-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.zone-pills-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.zone-pill {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.zone-pill:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.zone-pill--active {
+  background: var(--accent-primary);
+  color: #ffffff;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.header-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--bg-card);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.status-dot--online {
+  background-color: var(--status-patrolling);
+  box-shadow: 0 0 8px var(--status-patrolling);
+}
+
+.status-dot--offline {
+  background-color: var(--status-on-scene);
+  box-shadow: 0 0 8px var(--status-on-scene);
+}
+
+.status-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.header-clock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+}
+
+.clock-timezone {
+  color: var(--accent-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.clock-value {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.btn-heatmap-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-heatmap-toggle:hover {
+  background-color: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-card);
+}
+
+.btn-heatmap-toggle--active {
+  background: rgba(2, 132, 199, 0.25);
+  border-color: var(--accent-primary);
+  color: var(--text-highlight);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.toggle-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--text-muted);
+}
+
+.btn-heatmap-toggle--active .toggle-indicator {
+  background-color: var(--status-en-route);
+  box-shadow: 0 0 6px var(--status-en-route);
+}

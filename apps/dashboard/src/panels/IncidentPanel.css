@@ -1,0 +1,320 @@
+/* ==========================================================================
+   Incident Panel Component Styles
+   Owned by: Dev A (src/panels/IncidentPanel.css)
+   ========================================================================== */
+
+.incident-panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.panel-zone-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(56, 189, 248, 0.15);
+  color: var(--text-highlight);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.incident-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.incident-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Individual Incident Card
+   -------------------------------------------------------------------------- */
+.incident-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: var(--bg-card-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.incident-card:hover {
+  background-color: var(--bg-card-hover);
+  border-color: rgba(56, 189, 248, 0.3);
+  transform: translateY(-1px);
+}
+
+.incident-card--focused {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.incident-card--zone-selected {
+  border-left: 3px solid var(--accent-primary);
+}
+
+.incident-card--resolved {
+  opacity: 0.55;
+  background-color: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.incident-card--resolved:hover {
+  opacity: 0.8;
+}
+
+/* Card Top Row */
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-id-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.incident-id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.incident-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Status Chips strictly using theme semantic variables */
+.status-chip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.chip--received {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--status-received);
+  border: 1px solid var(--status-received);
+  animation: pulseChip 2s infinite ease-in-out;
+}
+
+@keyframes pulseChip {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--danger-glow);
+  }
+  50% {
+    box-shadow: 0 0 10px var(--danger-glow);
+  }
+}
+
+.chip--assigned {
+  background-color: rgba(14, 165, 233, 0.2);
+  color: var(--status-assigned);
+  border: 1px solid var(--status-assigned);
+}
+
+.chip--en-route {
+  background-color: rgba(56, 189, 248, 0.2);
+  color: var(--status-en-route);
+  border: 1px solid var(--status-en-route);
+}
+
+.chip--arrived {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: var(--status-on-scene);
+  border: 1px solid var(--status-on-scene);
+}
+
+.chip--resolved {
+  background-color: rgba(100, 116, 139, 0.2);
+  color: var(--status-resolved);
+  border: 1px solid var(--status-resolved);
+}
+
+.chip--neutral {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
+/* Card Body Row */
+.card-body-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2px 0;
+}
+
+.citizen-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.citizen-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.incident-zone {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.incident-eta-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.eta-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.eta-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.eta-value--imminent {
+  color: var(--status-on-scene);
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+/* Card Bottom Row */
+.card-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.patrol-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.patrol-label {
+  color: var(--text-muted);
+}
+
+.patrol-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Resolve Button */
+.btn-resolve {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--status-patrolling);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-resolve:hover:not(:disabled) {
+  background-color: var(--status-patrolling);
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.btn-resolve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resolved-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+}
+
+/* Inline Error Banner */
+.card-error-banner {
+  font-size: 11px;
+  color: var(--status-received);
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  margin-top: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Calm Empty State
+   -------------------------------------------------------------------------- */
+.calm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-sm);
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.empty-state-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--status-patrolling);
+  margin-bottom: 4px;
+}
+
+.empty-state-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  max-width: 240px;
+  line-height: 1.5;
+}

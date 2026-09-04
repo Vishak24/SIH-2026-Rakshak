@@ -1,0 +1,153 @@
+/* ==========================================================================
+   Patrol Strip Component Styles
+   Owned by: Dev A (src/panels/PatrolStrip.css)
+   ========================================================================== */
+
+.patrol-strip-bar {
+  height: 64px;
+  padding: 0 var(--space-md);
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-shrink: 0;
+  z-index: 90;
+  width: 100%;
+}
+
+.patrol-strip-header {
+  display: flex;
+  flex-direction: column;
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.patrol-strip-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  color: var(--text-primary);
+}
+
+.patrol-count-badge {
+  font-size: 10px;
+  color: var(--status-patrolling);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Chips Container: Single row, strictly non-wrapping
+   -------------------------------------------------------------------------- */
+.patrol-chips-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 6px;
+  min-width: 0;
+  align-items: center;
+}
+
+/* Individual Patrol Chip */
+.patrol-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-card-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  user-select: none;
+  transition: all 0.15s ease;
+  overflow: hidden;
+}
+
+.patrol-chip--clickable {
+  cursor: pointer;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.patrol-chip--clickable:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.patrol-chip--focused {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 10px var(--accent-glow);
+  background-color: rgba(2, 132, 199, 0.15);
+}
+
+.patrol-chip--idle {
+  cursor: default;
+}
+
+/* Status Dot */
+.patrol-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.patrol-dot--patrolling {
+  background-color: var(--status-patrolling);
+  box-shadow: 0 0 6px var(--status-patrolling);
+}
+
+.patrol-dot--en-route {
+  background-color: var(--status-en-route);
+  box-shadow: 0 0 6px var(--status-en-route);
+}
+
+.patrol-dot--on-scene {
+  background-color: var(--status-on-scene);
+  box-shadow: 0 0 6px var(--status-on-scene);
+}
+
+.patrol-dot--assigned {
+  background-color: var(--status-assigned);
+  box-shadow: 0 0 6px var(--status-assigned);
+}
+
+/* Identity & Zone Texts with Ellipsis */
+.patrol-name-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.patrol-zone-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 2;
+}
+
+/* Assigned Incident Badge */
+.patrol-assigned-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--status-received);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}

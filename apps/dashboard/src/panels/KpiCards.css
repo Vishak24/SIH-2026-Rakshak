@@ -1,0 +1,112 @@
+/* ==========================================================================
+   KPI Cards Component Styles
+   Owned by: Dev A (src/panels/KpiCards.css)
+   ========================================================================== */
+
+.kpi-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-1px);
+}
+
+.stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.stat-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+}
+
+.stat-card-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.5px;
+}
+
+.stat-card-badge--danger {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--status-received);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.stat-card-badge--success {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--status-patrolling);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.stat-card-badge--info {
+  background-color: rgba(56, 189, 248, 0.15);
+  color: var(--text-highlight);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.stat-card-badge--neutral {
+  background-color: rgba(100, 116, 139, 0.15);
+  color: var(--text-muted);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.stat-card-value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: 2px 0;
+}
+
+.value-alert {
+  color: var(--status-received);
+  text-shadow: 0 0 10px var(--danger-glow);
+}
+
+.value-nominal {
+  color: var(--status-patrolling);
+}
+
+.value-total {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.stat-card-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

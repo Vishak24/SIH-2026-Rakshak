@@ -1,0 +1,112 @@
+[
+  {
+    "zone": "Adyar",
+    "hour": 22,
+    "category": "Traffic Congestion & Late Night Gatherings",
+    "confidence": 0.88,
+    "riskScore": 0.65,
+    "riskLevel": "MODERATE",
+    "recommendation": "Maintain proactive patrol visibility along Sardar Patel Road corridor.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "T. Nagar",
+    "hour": 22,
+    "category": "High Footfall Commercial Density",
+    "confidence": 0.94,
+    "riskScore": 0.82,
+    "riskLevel": "HIGH",
+    "recommendation": "Deploy 2 active mobile units near Usman Road and Ranganathan Street.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Mylapore",
+    "hour": 22,
+    "category": "Temple Perimeter & Narrow Arterials",
+    "confidence": 0.81,
+    "riskScore": 0.45,
+    "riskLevel": "MODERATE",
+    "recommendation": "Routine perimeter surveillance around Tank Square and Luz Church Road.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Velachery",
+    "hour": 22,
+    "category": "Transit Hub & High Volume Junction",
+    "confidence": 0.89,
+    "riskScore": 0.74,
+    "riskLevel": "ELEVATED",
+    "recommendation": "Position rapid responder near Velachery Bypass junction.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Anna Nagar",
+    "hour": 22,
+    "category": "Commercial Avenues & Residential Crossings",
+    "confidence": 0.85,
+    "riskScore": 0.52,
+    "riskLevel": "MODERATE",
+    "recommendation": "Increase sweep frequency near Roundtana and 2nd Avenue.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Marina Beach",
+    "hour": 22,
+    "category": "Waterfront Promenade & Crowd Dispersal",
+    "confidence": 0.91,
+    "riskScore": 0.78,
+    "riskLevel": "HIGH",
+    "recommendation": "Maintain continuous coastal patrol along Kamarajar Salai.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Guindy",
+    "hour": 22,
+    "category": "Industrial & Multimodal Transit Hub",
+    "confidence": 0.79,
+    "riskScore": 0.58,
+    "riskLevel": "MODERATE",
+    "recommendation": "Monitor Kathipara interchange feed and station exits.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Tambaram",
+    "hour": 22,
+    "category": "Suburban Gateway & Railway Station Traffic",
+    "confidence": 0.83,
+    "riskScore": 0.62,
+    "riskLevel": "MODERATE",
+    "recommendation": "Station vehicle near GST Road flyover entry points.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Besant Nagar",
+    "hour": 22,
+    "category": "Beach Promenade & Cafe District",
+    "confidence": 0.77,
+    "riskScore": 0.38,
+    "riskLevel": "LOW",
+    "recommendation": "Standard mobile patrol around Elliot's Beach and 6th Avenue.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  },
+  {
+    "zone": "Egmore",
+    "hour": 22,
+    "category": "Railway Terminal & Commercial Artery",
+    "confidence": 0.86,
+    "riskScore": 0.55,
+    "riskLevel": "MODERATE",
+    "recommendation": "Maintain presence along Gandhi-Irwin Road.",
+    "modelVersion": "rakshak-v1.4-chennai",
+    "source": "Predictive Patrol Model"
+  }
+]
